@@ -10,7 +10,7 @@ import (
 	"github.com/segmentio/parquet-go"
 )
 
-func ExportTable(db *sql.DB, table string, dstWriter io.Writer) error {
+func ExportTable(db *sql.DB, table string, dstWriter io.Writer, options ...parquet.WriterOption) error {
 	ct, err := schema.ColumnTypes(db, "", table)
 	if err != nil {
 		return err
@@ -66,7 +66,10 @@ func ExportTable(db *sql.DB, table string, dstWriter io.Writer) error {
 
 	parquetSchema := parquet.SchemaOf(v.Interface())
 
-	w := parquet.NewWriter(dstWriter, parquetSchema)
+	ops := []parquet.WriterOption{parquetSchema}
+	ops = append(ops, options...)
+
+	w := parquet.NewWriter(dstWriter, ops...)
 
 	rows, err := db.Query(fmt.Sprintf("SELECT * FROM %s", table))
 	for rows.Next() {
