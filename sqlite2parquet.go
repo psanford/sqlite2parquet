@@ -85,9 +85,9 @@ func ExportTable(db *sql.DB, table string, dstWriter io.Writer, options ...parqu
 		}
 	}
 
-	err = rows.Close()
+	err = rows.Err()
 	if err != nil {
-		return fmt.Errorf("Error closing rows: %s", err)
+		return fmt.Errorf("iter err: %s", err)
 	}
 
 	return w.Close()
